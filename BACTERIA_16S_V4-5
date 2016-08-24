@@ -77,6 +77,8 @@ cluster(column=seasonality.trim.contigs.good.unique.good.filter.unique.precluste
 #Hay que determinar cuantas secuencias hay en cada OTU de cada grupo.
 make.shared(list=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.pick.pick.an.unique_list.list,count=manglar.cut.trim.contigs.good.unique.good.filter.unique.precluster.abund.uchime.pick.pick.count_table, label=0.03)
 
+#Para clasificar las OTUs
+classify.otu(list=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.pick.pick.an.unique_list.list, count=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.uchime.pick.pick.count_table, taxonomy=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.pick.pds.wang.pick.taxonomy, label=0.03)
+
 
 ### CON ESO YA DEBERIAMOS PODER JUGAR CON LOS ANÁLISIS!
-
