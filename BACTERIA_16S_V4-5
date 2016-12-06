@@ -1,5 +1,5 @@
-### BACTERIA 16S V4-5, obtenidas desde IMR-Sequencing, CA. ###
-### Recopilado por LK - Septiembre, 2016 ###
+##################### BACTERIA 16S V4-5, obtenidas desde IMR-Sequencing, CA. #####################
+##################### Recopilado por LK - Septiembre, 2016 #######################################
 
 #Recordar tener el mismo directorio: Ejecutable Mothur.exe y Uchime.exe; las bases de datos que quiera usar para asignar, todos los archivos de secuenciación y el archivo con los nombres de las muestras. Hacer archivo con los nombres de las muestras y sus respectivos archivos de secuenciación: Nombrarlo nombreX.files.txt para modificarlo y cuando este listo eliminar el .txt
 
