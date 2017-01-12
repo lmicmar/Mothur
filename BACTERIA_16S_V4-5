@@ -1,6 +1,8 @@
 ##################### BACTERIA 16S V4-5, obtenidas desde IMR-Sequencing, CA. #####################
 ##################### Recopilado por LK - Septiembre, 2016 #######################################
 
+##################### Pre-tratamiento de secuencias ##############################################
+
 #Recordar tener el mismo directorio: Ejecutable Mothur.exe y Uchime.exe; las bases de datos que quiera usar para asignar, todos los archivos de secuenciación y el archivo con los nombres de las muestras. Hacer archivo con los nombres de las muestras y sus respectivos archivos de secuenciación: Nombrarlo nombreX.files.txt para modificarlo y cuando este listo eliminar el .txt
 
 #Para hacer los contigs usar el siguiente comando (en mi caso con dos procesadores porque es lo que hay):
@@ -12,7 +14,7 @@ summary.seqs(fasta=seasonality.trim.contigs.fasta)
 #En nuestro caso las secuencias deberían variar entre 400-500 bp pero si tenemos máximos y mínimos muy distintos a esos y además tenemos ambigüedades en el 2.5% de nuestras muestras entonces corremos para limpiarlas:
 screen.seqs(fasta=seasonality.trim.contigs.fasta, group=seasonality.contigs.groups, maxambig=0, maxlength=500)
 
-#Para eliminar las secuencias que puedan ser por error del computador debido al alineamiento: 
+#Para eliminar las secuencias que puedan ser por error del computador debido a la generación de contigs: 
 unique.seqs(fasta=seasonality.trim.contigs.good.fasta)
 
 #Para facilitar la vida después, se hace una tabla con el numero de veces que cada secuencia única se encuentra en cada grupo: filas, nombre de la secuencia; columna, nombre del grupo.
@@ -21,12 +23,14 @@ count.seqs(name=seasonality.trim.contigs.good.names, group=seasonality.contigs.g
 #Y veo los resultados de la cuenta con:
 summary.seqs(count=seasonality.trim.contigs.good.count_table)
 
-#Para hacer el alineamiento con la base de datos mas rápido la idea es acotarla al segmento que amplificamos, con:
+#Para hacer el alineamiento con la base de datos mas rápido la idea es acotarla al segmento que amplificamos, con (Los numeros corresponden al V4-V5 no necesariamente aplica a su caso... VERIFIQUE SU ZONA POR FAVOR (JA JA)):
 pcr.seqs(fasta=silva.bacteria.fasta, start=11894, end=42000, keepdots=F, processors=2)
 
-system(rename silva.bacteria.pcr.fasta silva.v4.fasta)
-
+#Para renombrar en windows ocupe lo siguiente:
+system(rename silva.bacteria.pcr.fasta silva.v4.fasta) 
 summary.seqs(fasta=silva.v4.fasta)
+
+##################### Alineamiento y Verificación ################################################
 
 #Ahora ya puedo alinear las secuencias (voy a intentar a ver si funciona con el rango que le di =P)
 align.seqs(fasta=seasonality.trim.contigs.good.unique.fasta, reference=silva.v4.fasta)
@@ -34,7 +38,7 @@ align.seqs(fasta=seasonality.trim.contigs.good.unique.fasta, reference=silva.v4.
 #Y se vuelve a revisar como quedo con:
 summary.seqs(fasta=seasonality.trim.contigs.good.unique.align, count=seasonality.trim.contigs.good.count_table)
 
-#Para asegurarnos que están alineando en el mismo segmento :
+#Para asegurarnos que están alineando en el mismo segmento (notar que los numeros no necesariamente son los que aplican a su caso):
 screen.seqs(fasta=seasonality.trim.contigs.good.unique.align, count=seasonality.trim.contigs.good.count_table, summary=seasonality.trim.contigs.good.unique.summary, start=1968, end=11550, maxhomop=8)
 
 #Para ver como quedo: 
@@ -49,7 +53,7 @@ unique.seqs(fasta=seasonality.trim.contigs.good.unique.good.filter.fasta, count=
 #Se hace un pre-cluster para unir secuencias que puedan tener hasta 2 nt de diferencia.
 pre.cluster(fasta=seasonality.trim.contigs.good.unique.good.filter.unique.fasta, count=seasonality.trim.contigs.good.unique.good.filter.count_table, diffs=2) 
 
-#De acuerdo al pipeline del Lab:
+#De acuerdo al pipeline del Lab (Calcula la abundancia de cada pre cluster):
 split.abund(fasta=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.fasta, count=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.count_table, cutoff=1, accnos=true)
 
 #Para identificar y eliminar las quimeras del .count_table:
@@ -61,10 +65,12 @@ remove.seqs(fasta=seasonality.trim.contigs.good.unique.good.filter.unique.preclu
 #Para ver con que nos quedamos luego de eliminarlas:
 summary.seqs(fasta=current, count=current)
 
+##################### Asignación y Clasificación de OTUs ########################################## 
+
 #Clasificamos las secuencias para asegurarnos de que solo tenemos secuencias de 16S de Bacteria:
 classify.seqs(fasta=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.pick.fasta, count=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.uchime.pick.count_table, reference=trainset9_032012.pds.fasta, taxonomy=trainset9_032012.pds.tax, cutoff=80)  
 
-#Entonces ahora se eliminan las que no nos interesan:
+#Entonces ahora se eliminan las que no nos interesan (Modifique los taxones que no quiere, puede que varia segun su caso):
 remove.lineage(fasta=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.pick.fasta, count=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.uchime.pick.count_table, taxonomy=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.pick.pds.wang.taxonomy, taxon=Chloroplast-Mitochondria-unknown-Archaea-Eukaryota) 
 
 #Para ver lo que obtuvimos:
