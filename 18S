@@ -1,0 +1,218 @@
+###################### 18S general pipeline ####################
+
+mothur > make.file(inputdir=., type=gz)
+Setting input directory to: /media/lmicmar/Almacenamiento/Benjamin/Neblina/
+
+mothur > make.contigs(file=stability.files, processors=8)
+
+It took 79 secs to assemble 60083 reads.
+
+It took 80 secs to process 204570 sequences.
+
+Group count: 
+CNYT01	34604
+CNYT02	35240
+CNYT03	39412
+OY01	22499
+OY02	60083
+OY03	12732
+
+Total of all groups is 204570
+
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.fasta
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.qual
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.contigs.report
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.scrap.contigs.fasta
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.scrap.contigs.qual
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.contigs.groups
+
+[WARNING]: your sequence names contained ':'.  I changed them to '_' to avoid problems in your downstream analysis.
+
+mothur > summary.seqs(fasta=stability.trim.contigs.fasta)
+
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.summary
+
+It took 1 secs to summarize 204570 sequences.
+
+mothur > screen.seqs(fasta=stability.trim.contigs.fasta, summary=stability.trim.contigs.summary, minlength=400, maxlength=450, maxhomop=8, maxambig=0, group=stability.contigs.groups)
+
+Using 8 processors.
+
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.summary
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.fasta
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.bad.accnos
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.contigs.good.groups
+
+
+It took 2 secs to screen 204570 sequences.
+
+mothur > summary.seqs(fasta=stability.trim.contigs.good.fasta)
+
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.summary
+
+It took 1 secs to summarize 156117 sequences.
+
+mothur > unique.seqs(fasta=stability.trim.contigs.good.fasta)
+156117	88898
+
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.names
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.fasta
+
+mothur > count.seqs(name=stability.trim.contigs.good.names, group=stability.contigs.good.groups)
+
+It took 1 secs to create a table for 156117 sequences.
+Total number of sequences: 156117
+
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.count_table
+
+mothur > summary.seqs(fasta=stability.trim.contigs.good.unique.fasta, count=stability.trim.contigs.good.count_table)
+
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.summary
+
+It took 1 secs to summarize 156117 sequences.
+
+mothur > count.groups(count=stability.trim.contigs.good.count_table)
+CNYT01 contains 26649.
+CNYT02 contains 28962.
+CNYT03 contains 31714.
+OY01 contains 12644.
+OY02 contains 46329.
+OY03 contains 9819.
+
+Total seqs: 156117.
+
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.count.summary
+
+
+mothur > split.abund(fasta=stability.trim.contigs.good.unique.fasta, count=stability.trim.contigs.good.count_table, cutoff=1, accnos=true)
+
+Output File Names: 
+stability.trim.contigs.good.rare.count_table
+stability.trim.contigs.good.abund.count_table
+rare.accnos
+abund.accnos
+stability.trim.contigs.good.unique.rare.fasta
+stability.trim.contigs.good.unique.abund.fasta
+
+
+mothur > summary.seqs(fasta=stability.trim.contigs.good.unique.abund.fasta, count=stability.trim.contigs.good.abund.count_table)
+
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.summary
+
+It took 0 secs to summarize 78102 sequences.
+
+mothur > align.seqs(fasta=stability.trim.contigs.good.unique.abund.fasta, reference=/media/lmicmar/Almacenamiento/Data_Bases/Silva.seed_v123/silva.seed_v123.align, flip=true)
+Reading in the /media/lmicmar/Almacenamiento/Data_Bases/Silva.seed_v123/silva.seed_v123.align template sequences...	DONE.
+It took 13 to read  14914 sequences.
+Aligning sequences from /media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.fasta ...
+It took 26 secs to align 10883 sequences.
+
+
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.align
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.align.report
+
+mothur > summary.seqs(fasta=stability.trim.contigs.good.unique.abund.align, count=stability.trim.contigs.good.abund.count_table)
+
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.summary
+
+It took 3 secs to summarize 78102 sequences.
+
+mothur > filter.seqs(fasta=stability.trim.contigs.good.unique.abund.align, vertical=T, trump=.)
+
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.filter
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.fasta
+
+
+mothur > unique.seqs(fasta=stability.trim.contigs.good.unique.abund.filter.fasta, count=stability.trim.contigs.good.abund.count_table)
+10883	3501
+
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.count_table
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.fasta
+
+
+mothur > summary.seqs(fasta=stability.trim.contigs.good.unique.abund.filter.unique.fasta, count=stability.trim.contigs.good.unique.abund.filter.count_table)
+
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.summary
+
+It took 0 secs to summarize 78102 sequences.
+
+mothur > pre.cluster(fasta=stability.trim.contigs.good.unique.abund.filter.unique.fasta, count=stability.trim.contigs.good.unique.abund.filter.count_table, diffs=1, processors=8)
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.fasta
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.count_table
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.CNYT01.map
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.CNYT02.map
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.CNYT03.map
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.OY01.map
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.OY02.map
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.OY03.map
+
+mothur > summary.seqs(fasta=stability.trim.contigs.good.unique.abund.filter.unique.precluster.fasta, count=stability.trim.contigs.good.unique.abund.filter.unique.precluster.count_table)
+
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.summary
+
+It took 0 secs to summarize 78102 sequences.
+
+mothur > chimera.uchime(fasta=stability.trim.contigs.good.unique.abund.filter.unique.precluster.fasta, count=stability.trim.contigs.good.unique.abund.filter.unique.precluster.count_table, processors=8)
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.denovo.uchime.chimeras
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.denovo.uchime.accnos
+
+mothur > remove.seqs(fasta=current, count=current, accnos=current)
+Using /media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.denovo.uchime.accnos as input file for the accnos parameter.
+Using /media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.count_table as input file for the count parameter.
+Using /media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.fasta as input file for the fasta parameter.
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fasta
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.count_table
+
+mothur > summary.seqs(fasta=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fasta,  count=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.count_table)
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.summary
+
+It took 0 secs to summarize 74577 sequences.
+
+mothur > classify.seqs(fasta=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fasta, count=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.count_table, reference=/media/lmicmar/Almacenamiento/Data_Bases/Silva.seed_v128/silva.seed_v128.align, taxonomy=/media/lmicmar/Almacenamiento/Data_Bases/Silva.seed_v128/silva.seed_v128.tax, processors=8)
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.seed_v128.wang.taxonomy
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.seed_v128.wang.tax.summary
+
+mothur > dist.seqs(fasta=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fasta, cutoff=0.1, processors=8)
+
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.dist
+
+mothur > cluster(column=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.dist, count=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.count_table, method=furthest, cutoff=0.03)
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fn.unique_list.list
+
+mothur > classify.otu(list=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fn.unique_list.list, count=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.count_table, taxonomy=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.seed_v128.wang.taxonomy, label=0.02, probs=F)
+0.02	818
+
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fn.unique_list.0.02.cons.taxonomy
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fn.unique_list.0.02.cons.tax.summary
+
+mothur > make.shared(list=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fn.unique_list.list, count=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.count_table, label=0.02)
+0.02
+
+Output File Names: 
+/media/lmicmar/Almacenamiento/Benjamin/Neblina/stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fn.unique_list.shared
+
+
+mothur > quit
