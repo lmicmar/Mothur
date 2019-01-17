@@ -10,88 +10,85 @@
 #Para hacer los contigs usar el siguiente comando (en mi caso con dos procesadores porque es lo que hay):
 mothur > make.contigs(file=./stability.files, processors=8)
 
-
-
-
-
 #Chequear los resultados del ensamblaje de los contigs usando: 
-summary.seqs(fasta=seasonality.trim.contigs.fasta)
+mothur > summary.seqs(fasta=seasonality.trim.contigs.fasta)
 
 #En nuestro caso las secuencias deberían variar entre 400-500 bp pero si tenemos máximos y mínimos muy distintos a esos y además tenemos ambigüedades en el 2.5% de nuestras muestras entonces corremos para limpiarlas:
-screen.seqs(fasta=seasonality.trim.contigs.fasta, group=seasonality.contigs.groups, maxambig=0, maxlength=500)
+mothur > screen.seqs(fasta=stability.trim.contigs.fasta, summary=stability.trim.contigs.summary, minlength=400, maxlength=450, maxhomop=8, maxambig=0, processors=8, group=stability.contigs.groups)
 
 #Para eliminar las secuencias que puedan ser por error del computador debido a la generación de contigs: 
-unique.seqs(fasta=seasonality.trim.contigs.good.fasta)
+mothur > unique.seqs(fasta=current)
 
 #Para facilitar la vida después, se hace una tabla con el numero de veces que cada secuencia única se encuentra en cada grupo: filas, nombre de la secuencia; columna, nombre del grupo.
-count.seqs(name=seasonality.trim.contigs.good.names, group=seasonality.contigs.good.groups)
+mothur > count.seqs(name=stability.trim.contigs.good.names, group=stability.contigs.good.groups, processors=8)
 
 #Y veo los resultados de la cuenta con:
-summary.seqs(count=seasonality.trim.contigs.good.count_table)
+mothur > summary.seqs(fasta=stability.trim.contigs.good.unique.fasta, count=stability.trim.contigs.good.count_table, processors=8)
 
-#Para hacer el alineamiento con la base de datos mas rápido la idea es acotarla al segmento que amplificamos, con (Los numeros corresponden al V4-V5 no necesariamente aplica a su caso... VERIFIQUE SU ZONA POR FAVOR (JA JA)):
-pcr.seqs(fasta=silva.bacteria.fasta, start=11894, end=42000, keepdots=F, processors=2)
+mothur > count.groups(count=current)
 
-#Para renombrar en windows ocupe lo siguiente:
-system(rename silva.bacteria.pcr.fasta silva.v4.fasta) 
-summary.seqs(fasta=silva.v4.fasta)
+mothur > split.abund(fasta=current, count=current, cutoff=1, accnos=true)
+mothur > summary.seqs(fasta=stability.trim.contigs.good.unique.abund.fasta, count=stability.trim.contigs.good.abund.count_table)
+mothur > summary.seqs(fasta=stability.trim.contigs.good.unique.rare.fasta, count=stability.trim.contigs.good.rare.count_table)
+
 
 ##################### Alineamiento y Verificación ################################################
 
 #Ahora ya puedo alinear las secuencias (voy a intentar a ver si funciona con el rango que le di =P)
-align.seqs(fasta=seasonality.trim.contigs.good.unique.fasta, reference=silva.v4.fasta)
+mothur > align.seqs(fasta=stability.trim.contigs.good.unique.abund.fasta, reference=/media/lmicmar/Almacenamiento/Data_Bases/Silva.seed_v128/silva.seed_v128.align, flip=T)
 
 #Y se vuelve a revisar como quedo con:
-summary.seqs(fasta=seasonality.trim.contigs.good.unique.align, count=seasonality.trim.contigs.good.count_table)
-
-#Para asegurarnos que están alineando en el mismo segmento (notar que los numeros no necesariamente son los que aplican a su caso):
-screen.seqs(fasta=seasonality.trim.contigs.good.unique.align, count=seasonality.trim.contigs.good.count_table, summary=seasonality.trim.contigs.good.unique.summary, start=1968, end=11550, maxhomop=8)
-
-#Para ver como quedo: 
-summary.seqs(fasta=current, count=current)
+mothur > summary.seqs(fasta=stability.trim.contigs.good.unique.abund.align, count=stability.trim.contigs.good.abund.count_table)
 
 #Luego, eliminamos los gaps (-) de la tabla para solo quedarnos con los que tienen valores.
-filter.seqs(fasta=seasonality.trim.contigs.good.unique.good.align, vertical=T, trump=.)
+mothur > filter.seqs(fasta=stability.trim.contigs.good.unique.abund.align, vertical=T)
+mothur > summary.seqs(fasta=current)
 
 #Revisamos nuevamente que solo hayan secuencias únicas:
-unique.seqs(fasta=seasonality.trim.contigs.good.unique.good.filter.fasta, count=seasonality.trim.contigs.good.good.count_table)
+mothur > unique.seqs(fasta=stability.trim.contigs.good.unique.abund.filter.fasta, count=stability.trim.contigs.good.abund.count_table)
+mothur > summary.seqs(fasta=current)
 
 #Se hace un pre-cluster para unir secuencias que puedan tener hasta 2 nt de diferencia.
-pre.cluster(fasta=seasonality.trim.contigs.good.unique.good.filter.unique.fasta, count=seasonality.trim.contigs.good.unique.good.filter.count_table, diffs=2) 
-
-#De acuerdo al pipeline del Lab (Calcula la abundancia de cada pre cluster):
-split.abund(fasta=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.fasta, count=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.count_table, cutoff=1, accnos=true)
+mothur > pre.cluster(fasta=stability.trim.contigs.good.unique.abund.filter.unique.fasta, count=stability.trim.contigs.good.unique.abund.filter.count_table, diffs=1, processors=8)
+mothur > summary.seqs(fasta=current, count=current, processors=8)
 
 #Para identificar y eliminar las quimeras del .count_table:
-chimera.uchime(fasta=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.fasta, count=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.count_table, dereplicate=t)	
+mothur > chimera.uchime(fasta=stability.trim.contigs.good.unique.abund.filter.unique.precluster.fasta, count=stability.trim.contigs.good.unique.abund.filter.unique.precluster.count_table, processors=8)
 
 #Para eliminarlas luego del fasta:
-remove.seqs(fasta=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.fasta, accnos=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.uchime.accnos) 
-
-#Para ver con que nos quedamos luego de eliminarlas:
-summary.seqs(fasta=current, count=current)
+mothur > remove.seqs(fasta=current, count=current, accnos=current)
+mothur > summary.seqs(fasta=current, count=current)
 
 ##################### Asignación y Clasificación de OTUs ########################################## 
 
 #Clasificamos las secuencias para asegurarnos de que solo tenemos secuencias de 16S de Bacteria:
-classify.seqs(fasta=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.pick.fasta, count=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.uchime.pick.count_table, reference=trainset9_032012.pds.fasta, taxonomy=trainset9_032012.pds.tax, cutoff=80)  
+mothur > classify.seqs(fasta=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fasta, count=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.count_table, reference=/media/lmicmar/Almacenamiento/Data_Bases/Silva.seed_v128/silva.seed_v128.align, taxonomy=/media/lmicmar/Almacenamiento/Data_Bases/Silva.seed_v128/silva.seed_v128.tax, processors=8)
 
-#Entonces ahora se eliminan las que no nos interesan (Modifique los taxones que no quiere, puede que varia segun su caso):
+#Entonces ahora se eliminan las que no nos interesan (Opcional! Modifique los taxones que no quiere, puede que varia segun su caso):
 remove.lineage(fasta=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.pick.fasta, count=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.uchime.pick.count_table, taxonomy=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.pick.pds.wang.taxonomy, taxon=Chloroplast-Mitochondria-unknown-Archaea-Eukaryota) 
-
-#Para ver lo que obtuvimos:
 summary.seqs(fasta=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.pick.fasta, count=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.uchime.pick.count_table)
 
 #Ahora finalmente podemos hacer cluster con OTU’s yey!!
-dist.seqs(fasta=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.pick.pick.fasta, cutoff=0.1, processors=2) 		
+mothur > dist.seqs(fasta=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fasta, cutoff=0.1, processors=8)
 
-cluster(column=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.pick.pick.dist, count=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.uchime.pick.pick.count_table)
+mothur > cluster(column=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.dist, count=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.count_table, method=furthest, cutoff=0.03)
+
+#Clasificar basado en OTU!
+mothur > classify.otu(list=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fn.unique_list.list, count=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.count_table, taxonomy=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.seed_v128.wang.taxonomy, label=0.02, probs=F)
+###cambie nombre!
+mv stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fn.unique_list.0.02.cons.taxonomy stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fn.unique_list.0.02.cons.OTU.taxonomy
+mv stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fn.unique_list.0.02.cons.tax.summary stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fn.unique_list.0.02.cons.OTU.tax.summary
+
+#Clasificar basado en SEQS!
+mothur > classify.otu(list=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fn.unique_list.list, count=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.count_table, taxonomy=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.seed_v128.wang.taxonomy, label=0.02, probs=F, basis=sequence)
+mv stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fn.unique_list.0.02.cons.taxonomy stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fn.unique_list.0.02.cons.SEQS.taxonomy
+mv stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fn.unique_list.0.02.cons.tax.summary stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fn.unique_list.0.02.cons.SEQS.tax.summary
 
 #Hay que determinar cuantas secuencias hay en cada OTU de cada grupo.
-make.shared(list=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.pick.pick.an.unique_list.list, count=seasonality.cut.trim.contigs.good.unique.good.filter.unique.precluster.abund.uchime.pick.pick.count_table, label=0.03)
+mothur > make.shared(list=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fn.unique_list.list, count=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.count_table, label=0.02)
 
-#Para clasificar las OTUs
-classify.otu(list=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.pick.pick.an.unique_list.list, count=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.uchime.pick.pick.count_table, taxonomy=seasonality.trim.contigs.good.unique.good.filter.unique.precluster.abund.pick.pds.wang.pick.taxonomy, label=0.03)
+#Para obtener las secuencias representativas de cada OTU para posteriores verificaciones de la asignacion.
+mothur > get.oturep(count=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.count_table, list=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fn.unique_list.list, fasta=stability.trim.contigs.good.unique.abund.filter.unique.precluster.pick.fasta, method=abundance)
 
 
 ### CON ESO YA DEBERIAMOS PODER JUGAR CON LOS ANÁLISIS!
